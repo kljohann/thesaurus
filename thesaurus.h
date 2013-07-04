@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <ostream>
 #include <fstream>
 
 #include <boost/utility.hpp>
@@ -26,6 +27,8 @@ private:
 	std::string definition, category;
 	std::vector<std::string> synonyms;
 };
+
+std::ostream& operator<<(std::ostream& os, Definition const& def);
 
 class Index
 {

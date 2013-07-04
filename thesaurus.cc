@@ -15,6 +15,16 @@ bool Definition::operator!=(Definition const& other) const
 	return !(*this == other);
 }
 
+std::ostream& operator<<(std::ostream& os, Definition const& def)
+{
+	os << def.getDefinition() << " " << def.getCategory() << std::endl;
+	for (auto const& syn : def.getSynonyms())
+	{
+		os << " - " << syn << std::endl;
+	}
+	return os;
+}
+
 Index::Index(std::string const& filename)
 {
 	std::ifstream file(filename);
@@ -135,7 +145,9 @@ BOOST_PYTHON_MODULE(thesaurus)
 
   bp::class_<Thesaurus, boost::noncopyable>("Thesaurus", bp::init<std::string, std::string>())
 	  .def("lookup", &Thesaurus::lookup);
+
   bp::class_<Definition>("Definition", bp::no_init)
+	  .def(bp::self_ns::str(bp::self_ns::self))
 	  .add_property("definition", &Definition::getDefinition)
 	  .add_property("category",   &Definition::getCategory)
 	  .add_property("synonyms",   &Definition::getSynonyms);
