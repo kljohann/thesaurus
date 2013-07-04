@@ -4,7 +4,15 @@
 
 int main(int argc, char *argv[])
 {
-	Index idx("/usr/share/myspell/dicts/th_de_DE_v2.idx");
-	std::cout << idx.lookup("abbauen") << std::endl;
+	Thesaurus thes("/usr/share/myspell/dicts/th_de_DE_v2.idx", "/usr/share/myspell/dicts/th_de_DE_v2.dat");
+	auto defs = thes.lookup("absolut");
+	for (auto const& def : defs)
+	{
+		std::cout << def.definition << " " << def.category << std::endl;
+		for (auto const& syn : def.synonyms)
+		{
+			std::cout << "  - " << syn << std::endl;
+		}
+	}
 	return 0;
 }
