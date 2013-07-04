@@ -3,6 +3,18 @@
 #include <utility>
 #include <sstream>
 
+bool Definition::operator==(Definition const& other) const
+{
+	return (definition == other.definition
+		&& category == other.category
+		&& synonyms == other.synonyms);
+}
+
+bool Definition::operator!=(Definition const& other) const
+{
+	return !(*this == other);
+}
+
 Index::Index(std::string const& filename)
 {
 	std::ifstream file(filename);
@@ -31,7 +43,7 @@ Index::Index(std::string const& filename)
 	}
 }
 
-size_t Index::lookup(std::string const& name)
+size_t Index::lookup(std::string const& name) const
 {
 	auto const it = mIndex.find(name);
 	if (it != mIndex.end()) {
@@ -107,4 +119,24 @@ std::vector<Definition> Thesaurus::lookup(std::string const& name)
 	};
 
 	return results;
+}
+
+#include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+
+BOOST_PYTHON_MODULE(thesaurus)
+{
+  namespace bp = boost::python;
+  bp::class_<std::vector<Definition>>("Definitions")
+        .def(bp::vector_indexing_suite<std::vector<Definition>>());
+
+  bp::class_<std::vector<std::string>>("Strings")
+        .def(bp::vector_indexing_suite<std::vector<std::string>>());
+
+  bp::class_<Thesaurus, boost::noncopyable>("Thesaurus", bp::init<std::string, std::string>())
+	  .def("lookup", &Thesaurus::lookup);
+  bp::class_<Definition>("Definition", bp::no_init)
+	  .add_property("definition", &Definition::getDefinition)
+	  .add_property("category",   &Definition::getCategory)
+	  .add_property("synonyms",   &Definition::getSynonyms);
 }

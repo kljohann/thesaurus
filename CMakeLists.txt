@@ -27,9 +27,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER MATCHES "clang")
     -fno-limit-debug-info)
 endif()
 
-find_package(Boost 1.50.0 COMPONENTS REQUIRED)
+find_package(PythonLibs REQUIRED)
+find_package(Boost 1.50.0 COMPONENTS python3 REQUIRED)
 
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
-add_executable(test test.cc thesaurus.cc)
+PYTHON_ADD_MODULE(thesaurus thesaurus.cc)
+TARGET_LINK_LIBRARIES(thesaurus ${Boost_LIBRARIES} ${Python_LIBRARIES})
