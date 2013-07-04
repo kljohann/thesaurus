@@ -1,6 +1,7 @@
 #include "thesaurus.h"
 
 #include <utility>
+#include <sstream>
 
 Index::Index(std::string const& filename)
 {
@@ -77,25 +78,29 @@ std::vector<Definition> Thesaurus::lookup(std::string const& name)
 		std::string definition, category;
 		std::vector<std::string> synonyms;
 
-		if (!std::getline(mFile, category, '|')) {
+		if (!std::getline(mFile, line)) {
+			throw std::runtime_error("Could not read line.");
+		}
+
+		std::istringstream linestream(line);
+
+		if (!std::getline(linestream, category, '|')) {
 			throw std::runtime_error("Could not read part of speech.");
 		}
 
-		if (!std::getline(mFile, definition, '|')) {
+		if (!std::getline(linestream, definition, '|')) {
 			throw std::runtime_error("Could not read definition.");
 		}
 
-		if (!std::getline(mFile, line)) {
-			throw std::runtime_error("Could not read synonyms.");
-		}
+		if (std::getline(linestream, line)) {
+			line.push_back('|');
 
-		line.push_back('|');
-
-		size_t prev = 0, pos = 0;
-		while ((pos = line.find("|", prev)) != std::string::npos)
-		{
-			synonyms.emplace_back(line.substr(prev, pos - prev));
-			prev = pos + 1;
+			size_t prev = 0, pos = 0;
+			while ((pos = line.find("|", prev)) != std::string::npos)
+			{
+				synonyms.emplace_back(line.substr(prev, pos - prev));
+				prev = pos + 1;
+			}
 		}
 
 		results.emplace_back(definition, synonyms, category);
