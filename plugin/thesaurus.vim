@@ -7,6 +7,7 @@ let g:thesaurus_path   = get(g:, 'thesaurus_path', '/usr/share/myspell/dicts')
 let g:thesaurus_prefix = get(g:, 'thesaurus_prefix', 'th_')
 let g:thesaurus_suffix = get(g:, 'thesaurus_suffix', '_v2')
 let g:thesaurus_lang   = get(g:, 'thesaurus_lang', 'en_US')
+let g:thesaurus_height = get(g:, 'thesaurus_height', &helpheight)
 
 python << ENDPYTHON
 import os
@@ -57,7 +58,7 @@ ENDPYTHON
     return
   endif
 
-  silent! split __Thesaurus__
+  silent! exe g:thesaurus_height . 'split __Thesaurus__'
   setlocal ft=thesaurus
   setlocal buftype=nofile
   setlocal bufhidden=wipe
