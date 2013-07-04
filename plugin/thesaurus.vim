@@ -114,4 +114,35 @@ function! s:magic_lookup(...)
   call s:lookup(lang, word)
 endf
 
+function! ThesaurusCompletion(findstart, base)
+  if a:findstart
+    let [_, l:col] = searchpos('\<', 'bnW', line('.'))
+    return l:col - 1
+  else
+    echomsg a:base
+    let l:lang = get(b:, 'thesaurus_lang', g:thesaurus_lang)
+    let l:matches = []
+python << ENDPYTHON
+_escape = lambda t: t.replace("'", "''")
+definitions = thesaurus_manager.lookup(vim.eval('l:lang'), vim.eval('a:base'))
+for defi in definitions:
+    for syn in [defi.definition] + list(defi.synonyms):
+        #vim.command('call complete_add({})'.format(
+        vim.command('call add(matches, {})'.format(
+            repr({
+                'word': '%s',
+                'abbr': '%s',
+                'kind': '%s',
+                'dup': 1
+            }) % (
+                _escape(syn),
+                _escape(syn.split('(', 1)[0].strip()),
+                _escape((defi.category + '-')[0])
+            )))
+ENDPYTHON
+    return l:matches
+  endif
+endf
+
 command! -nargs=* Thesaurus call s:magic_lookup(<f-args>)
+command! ThesaurusEnableCompletion setl completefunc=ThesaurusCompletion
