@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(thesaurus)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(USE_PYTHON3 "Use python 3.x instead of python 2.x." OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Debug', use -DCMAKE_BUILD_TYPE=... to change this.")
@@ -27,8 +27,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER MATCHES "clang")
     -fno-limit-debug-info)
 endif()
 
-find_package(PythonLibs REQUIRED)
-find_package(Boost 1.50.0 COMPONENTS python3 REQUIRED)
+if (USE_PYTHON3)
+  find_package(PythonLibs 3 REQUIRED)
+  find_package(Boost 1.50.0 COMPONENTS python3 REQUIRED)
+else()
+  set(Python_ADDITIONAL_VERSIONS 2.7 2.6)
+  find_package(PythonLibs REQUIRED)
+  find_package(Boost 1.50.0 COMPONENTS python REQUIRED)
+endif()
 
 include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
