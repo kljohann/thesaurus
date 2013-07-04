@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <sstream>
+#include <stdexcept>
 
 bool Definition::operator==(Definition const& other) const
 {
