@@ -39,5 +39,5 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
-PYTHON_ADD_MODULE(thesaurus thesaurus.cc)
+PYTHON_ADD_MODULE(thesaurus src/thesaurus.cc)
 TARGET_LINK_LIBRARIES(thesaurus ${Boost_LIBRARIES} ${Python_LIBRARIES})
