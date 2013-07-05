@@ -6,19 +6,20 @@
 #include <ostream>
 #include <fstream>
 
-#include <boost/utility.hpp>
-
 class Definition
 {
 public:
-	Definition(std::string def, std::string cat = "") :
-		definition(def), category(cat), synonyms() {}
-	Definition(std::string def, std::vector<std::string> const& syns, std::string cat = "") :
+	Definition(std::string const& def, std::string const& cat = "",
+			   std::vector<std::string> const& syns = {}) :
 		definition(def), category(cat), synonyms(syns) {}
 
-	std::string getDefinition() const { return definition; }
-	std::string getCategory()   const { return category; }
-	std::vector<std::string> getSynonyms() const { return synonyms; }
+	Definition(std::string&& def, std::string&& cat,
+			   std::vector<std::string>&& syns) :
+		definition(def), category(cat), synonyms(syns) {}
+
+	std::string const& getDefinition() const { return definition; }
+	std::string const& getCategory()   const { return category; }
+	std::vector<std::string> const& getSynonyms() const { return synonyms; }
 
 	bool operator==(Definition const& other) const;
 	bool operator!=(Definition const& other) const;
@@ -41,7 +42,7 @@ private:
 	std::string mEncoding;
 };
 
-class Thesaurus : boost::noncopyable
+class Thesaurus
 {
 public:
 	Thesaurus(std::string const& indexpath, std::string const& datapath);
@@ -49,7 +50,7 @@ public:
 	std::vector<Definition> lookup(std::string const& name);
 
 private:
-	Index mIndex;
+	Index const mIndex;
 	std::ifstream mFile;
 	std::string mEncoding;
 };

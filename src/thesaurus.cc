@@ -3,6 +3,7 @@
 #include <utility>
 #include <sstream>
 #include <stdexcept>
+#include <boost/utility.hpp>
 
 bool Definition::operator==(Definition const& other) const
 {
@@ -78,7 +79,7 @@ Thesaurus::Thesaurus(std::string const& indexpath, std::string const& datapath) 
 
 std::vector<Definition> Thesaurus::lookup(std::string const& name)
 {
-	size_t offset = mIndex.lookup(name);
+	size_t const offset = mIndex.lookup(name);
 	if (offset == 0) {
 		return {};
 	}
@@ -126,7 +127,7 @@ std::vector<Definition> Thesaurus::lookup(std::string const& name)
 			}
 		}
 
-		results.emplace_back(definition, synonyms, category);
+		results.emplace_back(std::move(definition), std::move(category), std::move(synonyms));
 	};
 
 	return results;
@@ -138,6 +139,7 @@ std::vector<Definition> Thesaurus::lookup(std::string const& name)
 BOOST_PYTHON_MODULE(thesaurus)
 {
   namespace bp = boost::python;
+
   bp::class_<std::vector<Definition>>("Definitions")
         .def(bp::vector_indexing_suite<std::vector<Definition>>());
 
@@ -149,7 +151,10 @@ BOOST_PYTHON_MODULE(thesaurus)
 
   bp::class_<Definition>("Definition", bp::no_init)
 	  .def(bp::self_ns::str(bp::self_ns::self))
-	  .add_property("definition", &Definition::getDefinition)
-	  .add_property("category",   &Definition::getCategory)
-	  .add_property("synonyms",   &Definition::getSynonyms);
+	  .add_property("definition", bp::make_function(&Definition::getDefinition,
+					bp::return_value_policy<bp::copy_const_reference>()))
+	  .add_property("category", bp::make_function(&Definition::getCategory,
+					bp::return_value_policy<bp::copy_const_reference>()))
+	  .add_property("synonyms", bp::make_function(&Definition::getSynonyms,
+					bp::return_value_policy<bp::copy_const_reference>()));
 }
