@@ -37,3 +37,4 @@ select a synonym for the current word.
    as the path to the thesaurus file.
  * `b:thesaurus_lang` / `g:thesaurus_lang` is the default language.
  * `g:thesaurus_height` is the height of the split window that will be opened.
+ * `g:thesaurus_split` determines where to open the window. See the vim help on `:vert`, `:botright` &c.
