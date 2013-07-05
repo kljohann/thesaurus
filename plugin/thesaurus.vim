@@ -11,6 +11,7 @@ let g:thesaurus_height = get(g:, 'thesaurus_height', &helpheight)
 
 python << ENDPYTHON
 import os
+import re
 import sys
 
 instances = {}
@@ -24,6 +25,7 @@ class ThesaurusManager(object):
         except ImportError:
             self.module = None
         self.instances = {}
+        self.braces = re.compile(r'\([^(]*?\)')
 
     def lookup(self, lang, word):
         if not self.module:
@@ -44,10 +46,17 @@ class ThesaurusManager(object):
     @staticmethod
     def pretty(definitions):
         for defi in definitions:
-            yield '{} {}'.format(defi.definition, defi.category)
+            yield '{} ({})'.format(defi.definition, defi.category)
             for syn in defi.synonyms:
                 yield '  {}'.format(syn)
             yield ''
+
+    def extract(self, word):
+        prev = None
+        while word != prev:
+            prev = word
+            word = self.braces.sub('', word)
+        return word.strip()
 
     def clean(self):
         self.instances = {}
@@ -90,14 +99,10 @@ ENDPYTHON
 endfunction
 
 function! s:use_synonym()
-  let line = getline('.')
-  normal! _v
-  if line =~ '('
-    normal! t(ge
-  else
-    normal! g_
-  endif
-  normal y
+python << ENDPYTHON
+word = thesaurus_manager.extract(vim.eval('getline(".")'))
+vim.command("let @\" = '{}'".format(word.replace("'", "''")))
+ENDPYTHON
 
   bwipeout!
 endfunction
@@ -143,7 +148,7 @@ for defi in definitions:
                 'dup': 1
             }) % (
                 _escape(syn),
-                _escape(syn.split('(', 1)[0].strip()),
+                _escape(thesaurus_manager.extract(syn)),
                 _escape((defi.category + '-')[0])
             )))
 ENDPYTHON
