@@ -16,7 +16,7 @@ import re
 import sys
 
 instances = {}
-sys.path.insert(0, os.path.join(vim.eval('expand("<sfile>:h:h")'), 'lib'))
+sys.path.insert(0, os.path.join(vim.eval('expand("<sfile>:p:h:h")'), 'lib'))
 
 class ThesaurusManager(object):
     def __init__(self):
