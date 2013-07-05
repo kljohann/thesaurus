@@ -18,17 +18,24 @@ sys.path.insert(0, os.path.join(vim.eval('expand("<sfile>:h:h")'), 'lib'))
 
 class ThesaurusManager(object):
     def __init__(self):
-        import thesaurus
-        self.module = thesaurus
+        try:
+            import thesaurus
+            self.module = thesaurus
+        except ImportError:
+            self.module = None
         self.instances = {}
 
     def lookup(self, lang, word):
+        if not self.module:
+            vim.command("echoerr 'Could not load thesaurus python module.'")
+            return []
+
         if not lang in self.instances:
             name = os.path.join(
                 vim.eval('g:thesaurus_path'),
                 vim.eval('g:thesaurus_prefix') + lang + vim.eval('g:thesaurus_suffix'))
             if not os.path.exists(name + '.idx') or not os.path.exists(name + '.dat'):
-                vim.command("echoerr 'No thesaurus found for {}'".format(
+                vim.command("echoerr 'No thesaurus found for {}.'".format(
                     lang.replace("'", "''")))
                 return
             self.instances[lang] = self.module.Thesaurus(name + '.idx', name + '.dat')
