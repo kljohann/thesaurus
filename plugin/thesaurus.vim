@@ -114,7 +114,7 @@ function! s:magic_lookup(...)
   let args = copy(a:000)
 
   if a:0 >= 1
-    if a:1 =~? '[a-z]\{2}_[a-z]\{2}'
+    if a:1 =~ '\a\{2}_\a\{2}'
       let lang = a:1
       call remove(args, 0)
     endif
