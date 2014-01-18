@@ -14,6 +14,7 @@ python << ENDPYTHON
 import os
 import re
 import sys
+import vim
 
 instances = {}
 sys.path.insert(0, os.path.join(vim.eval('expand("<sfile>:p:h:h")'), 'lib'))
